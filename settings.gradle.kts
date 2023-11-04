@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "finalYearProject"
+rootProject.name = "Project"
 include(":app")
- 
+include(":myapplication")
