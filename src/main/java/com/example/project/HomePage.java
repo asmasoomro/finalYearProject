@@ -141,6 +141,7 @@ public class HomePage extends AppCompatActivity implements View.OnClickListener{
         if (view == ButtonAnalysis) {
             analyseText();
         }
+
     }
 
 

@@ -57,7 +57,7 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
         EditText journal = findViewById(R.id.journal);
         sourceText = journal.getText().toString();
         if (!sourceText.isEmpty()) {
-            String getURL = "https://api.uclassify.com/v1/uClassify/Sentiment/classify/?readKey=9QRZ6ZWbVRpH&text=" + sourceText;
+            String getURL = "https://api.uclassify.com/v1/asmasoomro/sentiment1/classify/?readKey=Eq0AQctXIjEh&text=" + sourceText;
 
             OkHttpClient client = new OkHttpClient();
             try {
@@ -76,8 +76,8 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
                         final String result = response.body().string();
                         try {
                             jsonResult = new JSONObject(result);
-                            final String convertedText = jsonResult.getString("positive");
-                            final String convertedText1 = jsonResult.getString("negative");
+                            final String convertedText = jsonResult.getString("positive1");
+                            final String convertedText1 = jsonResult.getString("negative1");
 
                             Log.d("okHttp", jsonResult.toString());
                             runOnUiThread(new Runnable() {
@@ -86,10 +86,10 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
                                     float a;
                                     a = Float.parseFloat(convertedText);
                                     a = a * 100;
-                                    txtpositive.setText("Positive: " + String.valueOf(a) + "%");
+                                    txtpositive.setText("Positive1: " + String.valueOf(a) + "%");
                                     a = Float.parseFloat(convertedText1);
                                     a = a * 100;
-                                    txtnegative.setText("Negative:" + String.valueOf(a) + "%");
+                                    txtnegative.setText("Negative1:" + String.valueOf(a) + "%");
                                 }
                             });
                         } catch (JSONException e) {
@@ -106,14 +106,14 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
     }
 
 
-        @Override
-        public void onClick (View view){
+    @Override
+    public void onClick (View view){
+        Intent intent = new Intent(Journal.this, Activities.class);
+        startActivity(intent);
+        finish();
 
-            if (view == ButtonAnalysis) {
-                analyseText();
-            }
+        if (view == ButtonAnalysis) {
+            analyseText();
         }
-
-
-
+    }
 }
