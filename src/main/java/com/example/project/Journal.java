@@ -83,13 +83,13 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    float a;
-                                    a = Float.parseFloat(convertedText);
-                                    a = a * 100;
-                                    txtpositive.setText("Positive1: " + String.valueOf(a) + "%");
-                                    a = Float.parseFloat(convertedText1);
-                                    a = a * 100;
-                                    txtnegative.setText("Negative1:" + String.valueOf(a) + "%");
+                                    float positivePercentage = Float.parseFloat(convertedText) * 100;
+                                    float negativePercentage = Float.parseFloat(convertedText1) * 100;
+
+                                    txtpositive.setText("Positive1: " + String.valueOf(positivePercentage) + "%");
+                                    txtnegative.setText("Negative1: " + String.valueOf(negativePercentage) + "%");
+
+                                    suggestActivities(positivePercentage, negativePercentage);
                                 }
                             });
                         } catch (JSONException e) {
@@ -104,13 +104,43 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
             }
         }
     }
+    private void suggestActivities(float positivePercentage, float negativePercentage) {
+        if (positivePercentage > 70) {
+            // High positive sentiment, suggest positive activities
+            suggestPositiveActivities();
+        } else if (negativePercentage > 70) {
+            // High negative sentiment, suggest activities to improve mood
+            suggestActivitiesToImproveMood();
+        } else {
+            // Neutral sentiment, suggest neutral or default activities
+            suggestDefaultActivities();
+        }
+    }
+
+    private void suggestPositiveActivities() {
+        Intent intent = new Intent(Journal.this, Activities.class);
+        startActivity(intent);
+         finish();
+    }
+
+    private void suggestActivitiesToImproveMood() {
+        // Implement logic to suggest activities to improve mood
+        // Example:
+        // startActivity(new Intent(Journal.this, ImproveMoodActivities.class));
+    }
+
+    private void suggestDefaultActivities() {
+        // Implement logic to suggest default or neutral activities
+        // Example:
+        // startActivity(new Intent(Journal.this, DefaultActivities.class));
+    }
 
 
     @Override
     public void onClick (View view){
-        Intent intent = new Intent(Journal.this, Activities.class);
-        startActivity(intent);
-        finish();
+      //  Intent intent = new Intent(Journal.this, Activities.class);
+     //   startActivity(intent);
+//        finish();
 
         if (view == ButtonAnalysis) {
             analyseText();
