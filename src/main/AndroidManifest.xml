@@ -32,6 +32,12 @@
             android:name=".RegisterPage"
             android:exported="false" />
         <activity
+            android:name=".PositiveActivities"
+            android:exported="false" />
+        <activity
+            android:name=".DefaultActivities"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

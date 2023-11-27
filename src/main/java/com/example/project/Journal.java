@@ -106,33 +106,30 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
     }
     private void suggestActivities(float positivePercentage, float negativePercentage) {
         if (positivePercentage > 70) {
-            // High positive sentiment, suggest positive activities
             suggestPositiveActivities();
         } else if (negativePercentage > 70) {
-            // High negative sentiment, suggest activities to improve mood
             suggestActivitiesToImproveMood();
         } else {
-            // Neutral sentiment, suggest neutral or default activities
             suggestDefaultActivities();
         }
     }
 
     private void suggestPositiveActivities() {
-        Intent intent = new Intent(Journal.this, Activities.class);
+        Intent intent = new Intent(Journal.this, PositiveActivities.class);
         startActivity(intent);
          finish();
     }
 
     private void suggestActivitiesToImproveMood() {
-        // Implement logic to suggest activities to improve mood
-        // Example:
-        // startActivity(new Intent(Journal.this, ImproveMoodActivities.class));
+        Intent intent = new Intent(Journal.this, Activities.class);
+        startActivity(intent);
+        finish();
     }
 
     private void suggestDefaultActivities() {
-        // Implement logic to suggest default or neutral activities
-        // Example:
-        // startActivity(new Intent(Journal.this, DefaultActivities.class));
+        Intent intent = new Intent(Journal.this, DefaultActivities.class);
+        startActivity(intent);
+        finish();
     }
 
 

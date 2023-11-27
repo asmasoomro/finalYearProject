@@ -1,21 +1,31 @@
 package com.example.project;
 
 public class ParseItem {
-    private String activites;
-
+   // private String imgUrl;
+    private String title;
 
     public ParseItem() {
     }
 
-    public ParseItem(String activites){
-        this.activites = activites;
+    public ParseItem(String title) {
+       // this.imgUrl = imgUrl;
+        this.title = title;
     }
 
-    public String getActivites() {
-        return activites;
+   // public String getImgUrl() {
+     //   return imgUrl;
+    //}
+
+    //public void setImgUrl(String imgUrl) {
+      //  this.imgUrl = imgUrl;
+    //}
+
+    public String getTitle() {
+        return title;
     }
 
-    public void setActivites(String activites) {
-        this.activites = activites;
+    public void setTitle(String title) {
+        this.title = title;
     }
+
 }
