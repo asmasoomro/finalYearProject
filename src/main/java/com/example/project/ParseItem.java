@@ -1,23 +1,23 @@
 package com.example.project;
 
 public class ParseItem {
-   // private String imgUrl;
+    // private String imgUrl;
     private String title;
 
     public ParseItem() {
     }
 
     public ParseItem(String title) {
-       // this.imgUrl = imgUrl;
+        // this.imgUrl = imgUrl;
         this.title = title;
     }
 
-   // public String getImgUrl() {
-     //   return imgUrl;
+    // public String getImgUrl() {
+    //   return imgUrl;
     //}
 
     //public void setImgUrl(String imgUrl) {
-      //  this.imgUrl = imgUrl;
+    //  this.imgUrl = imgUrl;
     //}
 
     public String getTitle() {

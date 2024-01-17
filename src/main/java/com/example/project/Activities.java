@@ -74,7 +74,7 @@ public class Activities extends AppCompatActivity {
 
                 Elements data = doc.select("h3.wp-block-heading");
                 int size = data.size();
-               // Log.d("items", "Number of activities: " + size);
+                // Log.d("items", "Number of activities: " + size);
                 for (int i = 0; i < size; i++) {
                     String activity = data.get(i).text();
                     parseItems.add(new ParseItem(activity));

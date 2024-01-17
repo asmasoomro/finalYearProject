@@ -1,5 +1,7 @@
 package com.example.project;
 
+ppackage com.example.project;
+
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -74,7 +76,7 @@ public class DefaultActivities extends AppCompatActivity {
 
                 Elements data = doc.select("h2");
                 int size = data.size();
-               // Log.d("items", "Number of activities: " + size);
+                // Log.d("items", "Number of activities: " + size);
                 for (int i = 0; i < size; i++) {
                     String activity = data.get(i).text();
                     parseItems.add(new ParseItem(activity));

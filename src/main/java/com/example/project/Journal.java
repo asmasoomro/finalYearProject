@@ -117,7 +117,7 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
     private void suggestPositiveActivities() {
         Intent intent = new Intent(Journal.this, PositiveActivities.class);
         startActivity(intent);
-         finish();
+        finish();
     }
 
     private void suggestActivitiesToImproveMood() {
@@ -135,8 +135,8 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick (View view){
-      //  Intent intent = new Intent(Journal.this, Activities.class);
-     //   startActivity(intent);
+        //  Intent intent = new Intent(Journal.this, Activities.class);
+        //   startActivity(intent);
 //        finish();
 
         if (view == ButtonAnalysis) {

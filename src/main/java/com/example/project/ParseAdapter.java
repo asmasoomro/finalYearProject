@@ -32,7 +32,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ParseAdapter.ViewHolder holder, int position) {
         ParseItem parseItem = parseItems.get(position);
         holder.textView.setText(parseItem.getTitle());
-      //  Picasso.get().load(parseItem.getImgUrl()).into(holder.imageView);
+        //  Picasso.get().load(parseItem.getImgUrl()).into(holder.imageView);
     }
 
     @Override
@@ -41,11 +41,11 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-    //    ImageView imageView;
+        //    ImageView imageView;
         TextView textView;
         public ViewHolder(@NonNull View itemView){
             super(itemView);
-         //   imageView = itemView.findViewById(R.id.imageView);
+            //   imageView = itemView.findViewById(R.id.imageView);
             textView = itemView.findViewById(R.id.textView);
         }
     }
