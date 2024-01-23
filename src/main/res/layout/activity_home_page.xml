@@ -83,6 +83,7 @@
             android:onClick="getSpeechInput"
             android:src="@drawable/mic" />
 
+
         <Button
             android:id="@+id/ButtonAnalysis"
             android:layout_width="match_parent"

@@ -1,0 +1,6 @@
+<!-- res/drawable/bg_marker.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FF4081" /> <!-- Change the color as needed -->
+    <corners android:radius="8dp" /> <!-- Adjust the corner radius as needed -->
+</shape>
