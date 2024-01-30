@@ -1,29 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp"
     tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="110dp"
+        android:layout_height="44dp"
+        android:background="?attr/colorPrimary">
+
+        <ImageView
+            android:id="@+id/toolbarIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Icon"
+            android:src="@drawable/weekly" />
+
+    </androidx.appcompat.widget.Toolbar>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+       android:layout_marginTop="8dp"/>
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Date Placeholder"
-        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"/>
 
     <TextView
         android:id="@+id/efficiencyTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dateTextView"
         android:layout_marginTop="16dp"
         android:text="Efficiency: "
         android:textStyle="bold" />
@@ -32,13 +51,8 @@
         android:id="@+id/qualityStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/efficiencyTextView"
         android:layout_marginTop="8dp"
         android:text="Quality Status: "
         android:textStyle="bold" />
 
-</RelativeLayout>
-
-
-
-
+</LinearLayout>

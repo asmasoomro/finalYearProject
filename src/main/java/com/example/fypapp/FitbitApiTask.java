@@ -1,4 +1,5 @@
 package com.example.fypapp;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -8,6 +9,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -26,19 +28,26 @@ public class FitbitApiTask extends AsyncTask<String, Void, String> {
         String currentDate = getCurrentDate();
 
         try {
-            URL url = new URL("https://api.fitbit.com/1.2/user/-/sleep/date/" + currentDate + ".json");
-          //  URL url = new URL("https://api.fitbit.com/1.2/user/-/sleep/date/2023-12-01.json");
+            URL url;
+            if (params.length > 1 && params[1] != null && params[1].equals("weekly")) {
+                // Fetch sleep logs for the past 7 days
+                String sevenDaysAgoDate = getPastDate(6);
+                url = new URL("https://api.fitbit.com/1.2/user/-/sleep/list.json" +
+                        "?afterDate=" + sevenDaysAgoDate +
+                        "&sort=desc&offset=0&limit=30");
+            } else {
+                // Fetch sleep log for the current day
+                url = new URL("https://api.fitbit.com/1.2/user/-/sleep/date/" + currentDate + ".json");
+            }
+
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-            // Set up the request headers
             urlConnection.setRequestMethod("GET");
             urlConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
 
-            // Get the response code
             int responseCode = urlConnection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                // Read the response
                 BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
                 StringBuilder response = new StringBuilder();
                 String inputLine;
@@ -50,7 +59,6 @@ public class FitbitApiTask extends AsyncTask<String, Void, String> {
 
                 return response.toString();
             } else {
-                // Handle error response
                 Log.e(TAG, "Error response code: " + responseCode);
                 return null;
             }
@@ -59,9 +67,17 @@ public class FitbitApiTask extends AsyncTask<String, Void, String> {
             return null;
         }
     }
+
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return sdf.format(new Date());
+    }
+
+    private String getPastDate(int daysAgo) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -daysAgo);
+        return sdf.format(calendar.getTime());
     }
 
     @Override
@@ -69,8 +85,6 @@ public class FitbitApiTask extends AsyncTask<String, Void, String> {
         super.onPostExecute(result);
 
         if (result != null) {
-            // Parse the JSON response using a JSON parsing library (e.g., Gson)
-            // Update UI or store data as needed
             listener.onApiSuccess(result);
         } else {
             // Handle the error
@@ -78,11 +92,10 @@ public class FitbitApiTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    // Interface to communicate API results to the caller
     public interface FitbitApiListener {
         void onApiSuccess(String result);
 
         void onApiError();
     }
-
 }
+

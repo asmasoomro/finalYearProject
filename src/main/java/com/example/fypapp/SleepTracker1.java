@@ -1,9 +1,12 @@
 package com.example.fypapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import androidx.appcompat.widget.Toolbar;
 
 public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.FitbitApiListener {
 
@@ -35,6 +39,7 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
     private TextView dateTextView;
     private TextView efficiencyTextView;
     private TextView qualityStatusTextView;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,12 +50,16 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
         dateTextView = findViewById(R.id.dateTextView);
         efficiencyTextView = findViewById(R.id.efficiencyTextView);
         qualityStatusTextView = findViewById(R.id.qualityStatusTextView);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setNavigationIcon(R.drawable.weekly);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDate = dateFormat.format(new Date());
         dateTextView.setText("Today's Date: " + todayDate);
 
-        new FitbitApiTask(this).execute("eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JONlkiLCJzdWIiOiJCUlM1UkQiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNzM3MDQ3MDkyLCJpYXQiOjE3MDU1MTEwOTJ9.hMoanmdtnfFPXlikV3E5Q-RhA1h5PnhW6TnFNepjUrM");
+        new FitbitApiTask(this).execute("eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JWQkMiLCJzdWIiOiJCUlM1UkQiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNzM3OTE1MTExLCJpYXQiOjE3MDYzNzkxMTF9.5vCuiUuQt7QiyNmzoVIeEjLpuBrDkrg6AaTdwizqK9M");
     }
 
     @Override
@@ -66,7 +75,6 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
             efficiencyTextView.setText("Efficiency: " + efficiency);
             qualityStatusTextView.setText("Quality Status: " + sleepQualityStatus);
 
-
             JSONObject levelsObject = sleepDataObject.getJSONObject("levels");
             JSONObject summaryObject = levelsObject.getJSONObject("summary");
 
@@ -75,45 +83,48 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
             List<BarEntry> entries = new ArrayList<>();
             List<String> labels = new ArrayList<>();
 
-            for (String sleepStage : new String[]{"awake", "light", "deep", "rem"}) {
+            for (String sleepStage : new String[]{"wake", "light", "deep", "rem"}) {
                 int stageDuration = summaryObject.getJSONObject(sleepStage).getInt("minutes");
-                float percentage = (float) stageDuration / totalDuration * 100f;
+                float percentage = totalDuration > 0 ? (float) stageDuration / totalDuration * 100f : 0f;
 
-                entries.add(new BarEntry(entries.size(), percentage)); // Store the percentage directly
+                entries.add(new BarEntry(entries.size(), percentage));
                 labels.add(getSleepStageLabel(sleepStage, stageDuration));
             }
 
-            BarDataSet dataSet = new BarDataSet(entries, "Sleep Data");
-            dataSet.setColors(getSleepStageColors());
+            if (!entries.isEmpty()) {
+                BarDataSet dataSet = new BarDataSet(entries, "Sleep Data");
+                dataSet.setColors(getSleepStageColors());
 
-            BarData barData = new BarData(dataSet);
-            barChart.setData(barData);
+                BarData barData = new BarData(dataSet);
+                barChart.setData(barData);
 
-            // Customize the bar chart
-            XAxis xAxis = barChart.getXAxis();
-            xAxis.setValueFormatter(new XAxisValueFormatter(labels));
-            xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-            xAxis.setGranularity(1f);
-            xAxis.setDrawGridLines(false);
+                // Customize the bar chart
+                XAxis xAxis = barChart.getXAxis();
+                xAxis.setValueFormatter(new XAxisValueFormatter(labels));
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setGranularity(1f);
+                xAxis.setDrawGridLines(false);
 
-            YAxis leftAxis = barChart.getAxisLeft();
-            leftAxis.setGranularity(1f);
-            leftAxis.setDrawGridLines(false);
-            leftAxis.setValueFormatter(new YAxisValueFormatter());
+                YAxis leftAxis = barChart.getAxisLeft();
+                leftAxis.setGranularity(1f);
+                leftAxis.setDrawGridLines(false);
+                leftAxis.setValueFormatter(new YAxisValueFormatter());
 
-            YAxis rightAxis = barChart.getAxisRight();
-            rightAxis.setEnabled(false);
+                YAxis rightAxis = barChart.getAxisRight();
+                rightAxis.setEnabled(false);
 
-            // Create an instance of your PercentMarker
-            PercentMarker percentMarker = new PercentMarker(getApplicationContext(), R.layout.custom_marker_view);
-            barChart.setMarker(percentMarker);
-            barChart.invalidate();
-
+                PercentMarker percentMarker = new PercentMarker(getApplicationContext(), R.layout.custom_marker_view);
+                barChart.setMarker(percentMarker);
+                barChart.invalidate();
+            } else {
+                Log.e("SleepTracker", "No chart data available");
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
 
     public int getSleepEfficiency(JSONObject sleepData) {
         try {
@@ -245,5 +256,22 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
         colors.add(getResources().getColor(android.R.color.holo_green_light)); // Deep
         colors.add(getResources().getColor(android.R.color.holo_purple));      // REM
         return colors;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+      switch (item.getItemId()){
+          case android.R.id.home:
+              showWeeklySleepLog();
+              return true;
+          default:
+              return super.onOptionsItemSelected(item);
+      }
+    }
+
+    private void showWeeklySleepLog(){
+        Intent intent = new Intent(this, WeeklySleep.class);
+        startActivity(intent);
+        Toast.makeText(this, "Weekly Sleep Log", Toast.LENGTH_SHORT).show();
     }
 }

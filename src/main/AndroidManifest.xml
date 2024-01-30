@@ -13,6 +13,9 @@
         android:theme="@style/Theme.FYPAPP"
         tools:targetApi="31">
         <activity
+            android:name=".WeeklySleep"
+            android:exported="false" />
+        <activity
             android:name=".WeeklyMood"
             android:exported="false" />
         <activity
