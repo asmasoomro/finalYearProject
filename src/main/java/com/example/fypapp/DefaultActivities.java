@@ -1,5 +1,6 @@
 package com.example.fypapp;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +24,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class DefaultActivities extends AppCompatActivity implements ParseAdapter.OnHeartIconClickListener {
+public class DefaultActivities extends AppCompatActivity implements ParseAdapter.OnHeartIconClickListener, ParseAdapter.OnFeedbackIconClickListener {
 
     private RecyclerView recyclerView;
     private ParseAdapter adapter;
@@ -40,7 +41,7 @@ public class DefaultActivities extends AppCompatActivity implements ParseAdapter
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ParseAdapter(parseItems, this, this);
+        adapter = new ParseAdapter(parseItems, this, this, this);
         recyclerView.setAdapter(adapter);
 
         Content content = new Content();
@@ -109,5 +110,12 @@ public class DefaultActivities extends AppCompatActivity implements ParseAdapter
     @Override
     public void onHeartIconClick(String activity, boolean favorited) {
         updateDatabase(activity, favorited);
+    }
+
+    @Override
+    public void onFeedbackIconClick(String activity) {
+        Intent feedbackIntent = new Intent(DefaultActivities.this, Feedback.class);
+        feedbackIntent.putExtra("activity", activity);
+        startActivity(feedbackIntent);
     }
 }

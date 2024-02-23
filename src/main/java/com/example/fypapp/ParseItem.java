@@ -3,6 +3,7 @@ package com.example.fypapp;
 public class ParseItem {
     private String title;
     private boolean isFavorited;
+    private String feedback;
 
     public ParseItem() {
     }
@@ -12,9 +13,10 @@ public class ParseItem {
         this.isFavorited = false;
     }
 
-    public ParseItem(String title, boolean isFavorited) {
+    public ParseItem(String title, boolean isFavorited, String feedback) {
         this.title = title;
         this.isFavorited = isFavorited;
+        this.feedback = feedback;
     }
 
     public String getTitle() {
@@ -31,5 +33,13 @@ public class ParseItem {
 
     public void setFavorited(boolean favorited) {
         isFavorited = favorited;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
 }

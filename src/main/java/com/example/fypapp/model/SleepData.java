@@ -9,8 +9,6 @@ public class SleepData {
     @SerializedName("duration")
     private int duration;
 
-    // Other fields and methods as needed
-
     public String getDateOfSleep() {
         return dateOfSleep;
     }

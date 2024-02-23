@@ -21,9 +21,17 @@
         <ImageView
             android:id="@+id/heartIcon"
             android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/ic_heart_outline"
-        android:padding="8dp"/>
+            android:layout_height="32dp"
+            android:src="@drawable/ic_heart_outline"
+            android:padding="8dp"/>
+
+        <ImageView
+            android:id="@+id/feedbackIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/feedback"
+            android:layout_gravity="end"
+            android:padding="8dp" />
 
     </LinearLayout>
 

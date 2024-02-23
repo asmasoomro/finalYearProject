@@ -64,7 +64,7 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
             }
 
             updateChart(sleepScores);
-
+            
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -72,7 +72,6 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
 
     @Override
     public void onApiError() {
-        // Handle API error
     }
 
     private void updateChart(List<Integer> sleepScores) {

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.fypapp.Favorite;
+import com.example.fypapp.Feedback;
 import com.example.fypapp.Journal;
 import com.example.fypapp.R;
 import com.example.fypapp.SleepTracker1;
@@ -40,7 +41,7 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OptionItem optionItem = optionItemList.get(position);
 
-        // Set the image and text for the current option
+        // Setting the image and text for the current option
         holder.imageView.setImageResource(optionItem.getImageResource());
         holder.textView.setText(optionItem.getOptionName());
 
@@ -66,6 +67,9 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
                 break;
             case "Weekly Mood Chart":
                 intent = new Intent(context, WeeklyMood.class);
+                break;
+            case "Feedback":
+                intent = new Intent(context, Feedback.class);
                 break;
             default:
                 return;
