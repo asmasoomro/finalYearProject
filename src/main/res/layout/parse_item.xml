@@ -18,12 +18,26 @@
             android:layout_weight="1"
             android:padding="8dp"/>
 
+        <TextView
+            android:id="@+id/positivePercentageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp" />
+
+        <ImageView
+            android:id="@+id/popularIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/popular"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/heartIcon"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/ic_heart_outline"
             android:padding="8dp"/>
+
 
         <ImageView
             android:id="@+id/feedbackIcon"

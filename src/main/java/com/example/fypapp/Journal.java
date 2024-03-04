@@ -122,8 +122,12 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
 
             Mood mood = new Mood(positivePercentage, negativePercentage);
 
-            // Save mood data to the database
-            userMoodRef.child(timestamp).setValue(mood);
+           // userMoodRef.child(timestamp).setValue(mood);
+            DatabaseReference moodEntryRef = userMoodRef.child(timestamp);
+            moodEntryRef.setValue(mood);
+
+            DatabaseReference positivePercentageRef = moodEntryRef.child("positivePercentage");
+            positivePercentageRef.setValue(positivePercentage);
         }
     }
     private void suggestActivities(float positivePercentage, float negativePercentage) {

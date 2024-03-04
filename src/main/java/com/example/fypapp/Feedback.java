@@ -1,6 +1,9 @@
 package com.example.fypapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -62,7 +65,7 @@ public class Feedback extends AppCompatActivity {
         String userFeedback = feelingsBefore + " " + feelingsDuring + " " + feelingsAfter;
 
         // Run the sentiment analysis
-        runSentimentAnalysis(feelingsAfter);
+        runSentimentAnalysis(userFeedback);
     }
 
     private void runSentimentAnalysis(String userFeedback) {
@@ -78,6 +81,10 @@ public class Feedback extends AppCompatActivity {
                     @Override
                     public void onFailure(Call call, IOException e) {
                         System.out.println(e.getMessage());
+                        // Handle failure (e.g., display an error message)
+                        runOnUiThread(() -> {
+                            txvResult.setText("Error: " + e.getMessage());
+                        });
                     }
 
                     @Override
@@ -96,12 +103,20 @@ public class Feedback extends AppCompatActivity {
                                     float positivePercentage = Float.parseFloat(convertedText) * 100;
                                     float negativePercentage = Float.parseFloat(convertedText1) * 100;
 
-                                    storeFeedbackInDatabase(userFeedback, positivePercentage);
+                                    // Assuming sentimentScore is obtained from your logic
+                                    float sentimentScore = calculateSentimentScore(positivePercentage, negativePercentage);
+                                    //  boolean isPositiveFeedback = sentimentScore > 70;
+
+                                    storeFeedbackInDatabase(userFeedback, sentimentScore, positivePercentage);
 
                                     txtpositive.setText("Positive1: " + String.valueOf(positivePercentage) + "%");
                                     txtnegative.setText("Negative1: " + String.valueOf(negativePercentage) + "%");
 
-                                    storeSentimentPercentages(positivePercentage, negativePercentage);
+                                    storeSentimentPercentages(sentimentScore, negativePercentage);
+
+                                    saveFeedbackAndFinish(Activities.class.getSimpleName(), positivePercentage);
+                                    saveFeedbackAndFinish(DefaultActivities.class.getSimpleName(), positivePercentage);
+                                    saveFeedbackAndFinish(PositiveActivities.class.getSimpleName(), positivePercentage);
                                 }
                             });
                         } catch (JSONException e) {
@@ -117,6 +132,9 @@ public class Feedback extends AppCompatActivity {
         }
     }
 
+    private float calculateSentimentScore(float positivePercentage, float negativePercentage) {
+        return positivePercentage;
+    }
 
     private void storeSentimentPercentages(float positivePercentage, float negativePercentage) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -129,17 +147,34 @@ public class Feedback extends AppCompatActivity {
         }
     }
 
-    private void storeFeedbackInDatabase(String feedback, float sentimentScore){
+    private void storeFeedbackInDatabase(String feedback, float sentimentScore, float positivePercentage) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
             DatabaseReference feedbackRef = FirebaseDatabase.getInstance().getReference("user_feedback").child(userId);
             String feedbackId = feedbackRef.push().getKey();
+            boolean isPositiveFeedback = positivePercentage > 70;
 
-            FeedbackEntry feedbackEntry = new FeedbackEntry(feedback, sentimentScore);
+            FeedbackEntry feedbackEntry = new FeedbackEntry(feedback, sentimentScore, positivePercentage, isPositiveFeedback);
+            //feedbackEntry.setPositiveFeedback(positivePercentage);
             feedbackRef.child(feedbackId).setValue(feedbackEntry);
         }
     }
 
+    private void saveFeedbackAndFinish(String callingClassName, float positivePercentage) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("callingClass", callingClassName);
+        resultIntent.putExtra("positivePercentage", positivePercentage);
+        setResult(RESULT_OK, resultIntent);
+
+        runOnUiThread(() -> {
+            // Display a success message or handle completion
+            txvResult.setText("Feedback submitted successfully for " + callingClassName);
+        });
+
+        finish();
+    }
+
 }
+
 
