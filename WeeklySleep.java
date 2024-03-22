@@ -1,46 +1,62 @@
 package com.example.fypapp;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.FitbitApiListener {
 
-    private Toolbar toolbar;
-    private LineChart lineChart;
+    private BarChart barChart;
     private TextView dateTextView;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weekly_sleep);
 
-        toolbar = findViewById(R.id.toolbarWeekly);
-        setSupportActionBar(toolbar);
-
-        toolbar.setNavigationIcon(R.drawable.weekly);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
-
-        lineChart = findViewById(R.id.lineChartWeekly);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        barChart = findViewById(R.id.barChartWeekly);
         dateTextView = findViewById(R.id.dateTextViewWeekly);
 
         fetchWeeklySleepData();
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.action_back) {
+                    onBackPressed();
+                    return true;
+                } else if (item.getItemId() == R.id.action_homePage) {
+                    startActivity(new Intent(WeeklySleep.this, HomePage1.class));
+                    Toast.makeText(WeeklySleep.this, "Home Page", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 
     private void fetchWeeklySleepData() {
@@ -64,7 +80,7 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
             }
 
             updateChart(sleepScores);
-            
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -75,45 +91,46 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
     }
 
     private void updateChart(List<Integer> sleepScores) {
-        List<Entry> entries = new ArrayList<>();
+        List<BarEntry> entries = new ArrayList<>();
         for (int i = 0; i < sleepScores.size(); i++) {
-            entries.add(new Entry(i, sleepScores.get(i)));
+            entries.add(new BarEntry(i, sleepScores.get(i)));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Weekly Sleep Data");
+        BarDataSet dataSet = new BarDataSet(entries, "Weekly Sleep Data");
         dataSet.setColors(getSleepStageColors());
-        dataSet.setDrawValues(true);
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setValueTextSize(12f);
+        BarData barData = new BarData(dataSet);
 
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
+        barChart.setData(barData);
 
-        XAxis xAxis = lineChart.getXAxis();
+        XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new XAxisValueFormatter());
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
         xAxis.setDrawGridLines(false);
 
-        YAxis leftAxis = lineChart.getAxisLeft();
+        YAxis leftAxis = barChart.getAxisLeft();
         leftAxis.setGranularity(1f);
         leftAxis.setDrawGridLines(false);
         leftAxis.setValueFormatter(new YAxisValueFormatter());
 
-        YAxis rightAxis = lineChart.getAxisRight();
+        YAxis rightAxis = barChart.getAxisRight();
         rightAxis.setEnabled(false);
 
         dateTextView.setText("Weekly Sleep Log");
     }
 
-    private class YAxisValueFormatter extends ValueFormatter {
+    private class YAxisValueFormatter extends com.github.mikephil.charting.formatter.ValueFormatter {
         @Override
-        public String getAxisLabel(float value, AxisBase axis) {
+        public String getAxisLabel(float value, com.github.mikephil.charting.components.AxisBase axis) {
             return String.valueOf((int) value);
         }
     }
 
-    private class XAxisValueFormatter extends ValueFormatter {
+    private class XAxisValueFormatter extends com.github.mikephil.charting.formatter.ValueFormatter {
         @Override
-        public String getAxisLabel(float value, AxisBase axis) {
+        public String getAxisLabel(float value, com.github.mikephil.charting.components.AxisBase axis) {
             int index = (int) value;
             switch (index) {
                 case 0:
@@ -148,6 +165,7 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
         return colors;
     }
 }
+
 
 
 

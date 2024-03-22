@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.fypapp.ActivitiesNotWork;
+import com.example.fypapp.ActivitiesWorked;
 import com.example.fypapp.Favorite;
 import com.example.fypapp.Feedback;
 import com.example.fypapp.Journal;
@@ -68,8 +70,11 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
             case "Weekly Mood Chart":
                 intent = new Intent(context, WeeklyMood.class);
                 break;
-            case "Feedback":
-                intent = new Intent(context, Feedback.class);
+            case "Activities That Worked for me":
+                intent = new Intent(context, ActivitiesWorked.class);
+                break;
+            case "Activities That Did not Work for me":
+                intent = new Intent(context, ActivitiesNotWork.class);
                 break;
             default:
                 return;

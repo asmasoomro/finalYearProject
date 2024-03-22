@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomePage1 extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,8 +21,9 @@ public class HomePage1 extends AppCompatActivity {
         optionItemList.add(new OptionItem(R.drawable.journal, "Journal"));
         optionItemList.add(new OptionItem(R.drawable.sleep, "Sleep Tracker"));
         optionItemList.add(new OptionItem(R.drawable.favorite, "Favorite"));
-        optionItemList.add(new OptionItem(R.drawable.weekly, "Weekly Mood Chart"));
-        optionItemList.add(new OptionItem(R.drawable.feedback, "Feedback"));
+        optionItemList.add(new OptionItem(R.drawable.week, "Weekly Mood Chart"));
+        optionItemList.add(new OptionItem(R.drawable.tick, "Activities That Worked for me"));
+        optionItemList.add(new OptionItem(R.drawable.x, "Activities That Did not Work for me"));
 
         // Set up RecyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerView);

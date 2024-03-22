@@ -1,58 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".MainActivity">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="110dp"
-        android:layout_height="44dp"
-        android:background="?attr/colorPrimary">
-
-        <ImageView
-            android:id="@+id/toolbarIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="Icon"
-            android:src="@drawable/weekly" />
-
-    </androidx.appcompat.widget.Toolbar>
+    android:padding="16dp">
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/barChart"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-       android:layout_marginTop="8dp"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="80dp"
+        android:layout_above="@id/bottom_navigation" />
 
     <TextView
         android:id="@+id/dateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Date Placeholder"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"/>
+        android:layout_above="@id/bottom_navigation"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="Date Placeholder" />
+
 
     <TextView
         android:id="@+id/efficiencyTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_above="@id/dateTextView"
+        android:layout_centerHorizontal="true"
         android:text="Efficiency: "
         android:textStyle="bold" />
+
 
     <TextView
         android:id="@+id/qualityStatusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_above="@id/efficiencyTextView"
+        android:layout_centerHorizontal="true"
         android:text="Quality Status: "
         android:textStyle="bold" />
 
-</LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_menu"
+        app:itemIconTint="@null"/>
+</RelativeLayout>

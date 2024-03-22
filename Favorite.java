@@ -66,7 +66,7 @@ public class Favorite extends AppCompatActivity {
                         boolean isFavorited = snapshot.getValue(Boolean.class);
 
                         // Create a ParseItem object and add it to the list
-                        ParseItem favoritedItem = new ParseItem(favoritedActivityTitle);
+                        ParseItem favoritedItem = new ParseItem(favoritedActivityTitle, isFavorited);
                         favoritedItem.setFavorited(isFavorited);
                         favoritedActivities.add(favoritedItem);
                     }

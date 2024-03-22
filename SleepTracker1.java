@@ -2,12 +2,17 @@ package com.example.fypapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.github.mikephil.charting.charts.BarChart;
@@ -22,6 +27,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.MPPointF;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import androidx.appcompat.widget.Toolbar;
+
 
 public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.FitbitApiListener {
 
@@ -39,8 +45,7 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
     private TextView dateTextView;
     private TextView efficiencyTextView;
     private TextView qualityStatusTextView;
-    private Toolbar toolbar;
-
+   private BottomNavigationView bottomNavigationView;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,19 +55,33 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
         dateTextView = findViewById(R.id.dateTextView);
         efficiencyTextView = findViewById(R.id.efficiencyTextView);
         qualityStatusTextView = findViewById(R.id.qualityStatusTextView);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        toolbar.setNavigationIcon(R.drawable.weekly);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayDate = dateFormat.format(new Date());
         dateTextView.setText("Today's Date: " + todayDate);
 
         new FitbitApiTask(this).execute("eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JWQkMiLCJzdWIiOiJCUlM1UkQiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNzM3OTE1MTExLCJpYXQiOjE3MDYzNzkxMTF9.5vCuiUuQt7QiyNmzoVIeEjLpuBrDkrg6AaTdwizqK9M");
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.action_back) {
+                    onBackPressed();
+                    return true;
+                } else if (item.getItemId() == R.id.action_weekly) {
+                    startActivity(new Intent(SleepTracker1.this, WeeklySleep.class));
+                    Toast.makeText(SleepTracker1.this, "Weekly Sleep Log", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 
-    @Override
+        @Override
     public void onApiSuccess(String result) {
         try {
             JSONObject jsonObject = new JSONObject(result);

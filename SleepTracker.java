@@ -27,6 +27,7 @@ import com.example.fypapp.model.SleepResponse;
 import com.example.fypapp.network.FitbitApi;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -194,6 +195,7 @@ public class SleepTracker extends AppCompatActivity {
 
         String userId = "BRS5RD";
         String currentDate = getCurrentDate();
+       // String date = "2024-03-13";
         // Use the obtained user ID in the API call
         Call<SleepResponse> call = fitbitApi.getSleepData(userId, currentDate, authorizationHeader);
 

@@ -5,23 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".Feedback">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="What Activity did you complete?"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
-    <EditText
-        android:id="@+id/editTextActivity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter the activity you completed"
-        android:inputType="textMultiLine"
-        android:layout_marginBottom="16dp"/>
+    tools:context=".Feedback2">
 
     <TextView
         android:layout_width="match_parent"
@@ -111,5 +95,15 @@
         android:textColor="#000"
         android:textSize="26sp"
         android:textStyle="normal" />
+
+    <ImageView
+        android:id="@+id/imageViewTick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/tick"
+        android:visibility="gone"
+        android:layout_below="@id/txvResult"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>
