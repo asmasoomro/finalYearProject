@@ -100,7 +100,7 @@ public class FeedbackEntry implements Parcelable {
     }
 
     public String getActivityName() {
-        return activityName;
+        return activityName != null ? activityName : feedback;
     }
 
     public void setActivityName(String activityName) {

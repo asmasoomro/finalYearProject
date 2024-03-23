@@ -29,6 +29,11 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         this.onHeartIconClickListener = onHeartIconClickListener;
         this.onFeedbackIconClickListener = onFeedbackIconClickListener;
     }
+    public void setItems(ArrayList<ParseItem> newItems) {
+        this.parseItems = newItems;
+        notifyDataSetChanged(); // Notify adapter that data set has changed
+    }
+
 
 
     @NonNull
@@ -45,11 +50,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
 
         // Display the positive percentage
         holder.positivePercentageTextView.setText("Positive: " + parseItem.getPositivePercentage() + "%");
-        if (parseItem.isPositiveFeedback()) {
-            holder.imageViewTick.setVisibility(View.VISIBLE);
-        } else {
-            holder.imageViewTick.setVisibility(View.GONE);
-        }
+        holder.checkmark.setVisibility(parseItem.isPositiveFeedback() ? View.VISIBLE : View.GONE);
 
         int heartIconResource = parseItem.isFavorited() ? R.drawable.heart2 : R.drawable.heart;
         holder.heartIcon.setImageResource(heartIconResource);
@@ -97,7 +98,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         ImageView heartIcon;
         ImageView feedbackIcon;
         ImageView popularIcon;
-        ImageView imageViewTick;
+        ImageView checkmark;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -106,7 +107,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
             heartIcon = itemView.findViewById(R.id.heartIcon);
             feedbackIcon = itemView.findViewById(R.id.feedbackIcon);
             popularIcon = itemView.findViewById(R.id.popularIcon);
-            imageViewTick = itemView.findViewById(R.id.imageViewTick);
+            checkmark = itemView.findViewById(R.id.imageViewTick);
         }
     }
 

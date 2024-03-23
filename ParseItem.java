@@ -13,11 +13,29 @@ public class ParseItem implements Parcelable {
     private float positivePercentage;
     private boolean isPopular;
     private boolean isPositiveFeedback;
+    private boolean hasPositiveFeedback;
+    private float sentimentScore;
+
     private FeedbackEntry feedbackEntry;
 
     public ParseItem() {
     }
 
+    public boolean isHasPositiveFeedback() {
+        return hasPositiveFeedback;
+    }
+
+    public void setHasPositiveFeedback(boolean hasPositiveFeedback) {
+        this.hasPositiveFeedback = hasPositiveFeedback;
+    }
+
+    public float getSentimentScore() {
+        return sentimentScore;
+    }
+
+    public void setSentimentScore(float sentimentScore) {
+        this.sentimentScore = sentimentScore;
+    }
 
     protected ParseItem(Parcel in) {
         title = in.readString();
@@ -50,12 +68,24 @@ public class ParseItem implements Parcelable {
         this.title = title;
         this.isFavorited = isFavorited;
     }
+    public ParseItem(String title, float positivePercentage, boolean isPopular, float sentimentScore) {
+        this.title = title;
+        this.positivePercentage = positivePercentage;
+        this.isPopular = isPopular;
+        this.sentimentScore = sentimentScore;
+    }
     public ParseItem(String title, float positivePercentage, boolean isPositiveFeedback, boolean isPopular, FeedbackEntry feedbackEntry) {
         this.title = title;
         this.positivePercentage = positivePercentage;
         this.isPositiveFeedback = isPositiveFeedback;
         this.isPopular = isPopular;
         this.feedbackEntry = feedbackEntry;
+    }
+    public ParseItem(String title, float positivePercentage, boolean isPopular, boolean hasPositiveFeedback) {
+        this.title = title;
+        this.positivePercentage = positivePercentage;
+        this.isPopular = isPopular;
+        this.hasPositiveFeedback = hasPositiveFeedback;
     }
 
 

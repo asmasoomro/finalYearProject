@@ -1,6 +1,8 @@
 package com.example.fypapp;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -66,7 +68,6 @@ public class Activities extends AppCompatActivity implements ParseAdapter.OnHear
     }
 
     private class Content extends AsyncTask<Void, Void, ArrayList<ParseItem>> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -102,7 +103,48 @@ public class Activities extends AppCompatActivity implements ParseAdapter.OnHear
                 adapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
                 progressBar.startAnimation(AnimationUtils.loadAnimation(Activities.this, android.R.anim.fade_out));
+                fetchAndDisplayActivitiesWithSentimentScore();
             });
+        }
+        private void fetchAndDisplayActivitiesWithSentimentScore() {
+            DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("feedback");
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                String userId = user.getUid();
+                databaseRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            FeedbackEntry entry = snapshot.getValue(FeedbackEntry.class);
+                            if (entry != null) {
+                                String activityName = entry.getActivityName(); // This should now return the correct name
+                                Log.d("FirebaseData", "Fetched activity: " + activityName + " with score: " + entry.getSentimentScore());
+                                for (int i = 0; i < parseItems.size(); i++) {
+                                    ParseItem parseItem = parseItems.get(i);
+                                    if (parseItem.getTitle().equals(activityName)) {
+                                        String titleWithEmoji = parseItem.getTitle();
+                                        if (entry.getSentimentScore() > 50) {
+                                            titleWithEmoji += " ✅";
+                                            Log.d("FirebaseData", "Added tick to: " + activityName);
+                                        } else {
+                                            titleWithEmoji += " ❌";
+                                            Log.d("FirebaseData", "Added cross to: " + activityName);
+                                        }
+                                        parseItem.setTitle(titleWithEmoji);
+                                        break; // No need to continue the loop after updating the item
+                                    }
+                                }
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("Firebase", "Failed to read sentiment scores", databaseError.toException());
+                    }
+                });
+            }
         }
 
         @Override
@@ -122,7 +164,6 @@ public class Activities extends AppCompatActivity implements ParseAdapter.OnHear
                     // Fetch feedback entries for the activity from Firebase Realtime Database
                     float positivePercentage = getPositivePercentageSafely(activity);
 
-                    // Determine if the activity is popular based on positive percentage
                     boolean isPopular = positivePercentage > 70;
 
                     // Create ParseItem instance with activity details and update popularity

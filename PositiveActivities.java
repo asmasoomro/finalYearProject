@@ -34,6 +34,7 @@ import java.util.Comparator;
 import java.util.concurrent.ExecutionException;
 
 import com.example.fypapp.model.FeedbackEntry;
+import com.google.firebase.database.ValueEventListener;
 
 public class PositiveActivities extends AppCompatActivity implements ParseAdapter.OnHeartIconClickListener, ParseAdapter.OnFeedbackIconClickListener {
 
@@ -98,7 +99,48 @@ public class PositiveActivities extends AppCompatActivity implements ParseAdapte
                 adapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
                 progressBar.startAnimation(AnimationUtils.loadAnimation(PositiveActivities.this, android.R.anim.fade_out));
+                fetchAndDisplayActivitiesWithSentimentScore();
             });
+        }
+        private void fetchAndDisplayActivitiesWithSentimentScore() {
+            DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("feedback");
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                String userId = user.getUid();
+                databaseRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            FeedbackEntry entry = snapshot.getValue(FeedbackEntry.class);
+                            if (entry != null) {
+                                String activityName = entry.getActivityName(); // This should now return the correct name
+                                Log.d("FirebaseData", "Fetched activity: " + activityName + " with score: " + entry.getSentimentScore());
+                                for (int i = 0; i < parseItems.size(); i++) {
+                                    ParseItem parseItem = parseItems.get(i);
+                                    if (parseItem.getTitle().equals(activityName)) {
+                                        String titleWithEmoji = parseItem.getTitle();
+                                        if (entry.getSentimentScore() > 50) {
+                                            titleWithEmoji += " ✅";
+                                            Log.d("FirebaseData", "Added tick to: " + activityName);
+                                        } else {
+                                            titleWithEmoji += " ❌";
+                                            Log.d("FirebaseData", "Added cross to: " + activityName);
+                                        }
+                                        parseItem.setTitle(titleWithEmoji);
+                                        break; // No need to continue the loop after updating the item
+                                    }
+                                }
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e("Firebase", "Failed to read sentiment scores", databaseError.toException());
+                    }
+                });
+            }
         }
 
         @Override
