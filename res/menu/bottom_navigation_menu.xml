@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_back"
+        android:icon="@drawable/back"
+        android:title="Back" />
+    <item
+        android:id="@+id/action_weekly"
+        android:icon="@drawable/week"
+        android:title="Weekly" />
+</menu>
