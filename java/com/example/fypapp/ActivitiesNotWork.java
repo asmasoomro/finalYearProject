@@ -36,7 +36,7 @@ public class ActivitiesNotWork extends AppCompatActivity {
         retrieveActivitiesWithNegativeSentimentScore();
     }
 
-    private void retrieveActivitiesWithNegativeSentimentScore() {
+    public void retrieveActivitiesWithNegativeSentimentScore() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             DatabaseReference feedbackRef = FirebaseDatabase.getInstance().getReference("feedback").child(user.getUid());

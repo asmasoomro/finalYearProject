@@ -56,6 +56,7 @@ public class SleepTracker1 extends AppCompatActivity implements FitbitApiTask.Fi
         efficiencyTextView = findViewById(R.id.efficiencyTextView);
         qualityStatusTextView = findViewById(R.id.qualityStatusTextView);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setItemIconTintList(null);
 
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());

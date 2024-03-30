@@ -22,37 +22,30 @@ import com.example.fypapp.model.OptionItem;
 
 import java.util.List;
 
-public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHolder> {
+public class OptionsAdapter  {
 
     private List<OptionItem> optionItemList;
     private Context context;
+    private LayoutInflater inflater;
 
     public OptionsAdapter(Context context, List<OptionItem> optionItemList) {
         this.context = context;
         this.optionItemList = optionItemList;
+        this.inflater = LayoutInflater.from(context);
     }
-
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_option, parent, false);
-        return new ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public View createItemView(ViewGroup parent, int position) {
+        View view = inflater.inflate(R.layout.item_option, parent, false);
         OptionItem optionItem = optionItemList.get(position);
 
-        // Setting the image and text for the current option
-        holder.imageView.setImageResource(optionItem.getImageResource());
-        holder.textView.setText(optionItem.getOptionName());
+        ImageView imageView = view.findViewById(R.id.imageOption);
+        TextView textView = view.findViewById(R.id.textOption);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleOptionClick(optionItem);
-            }
-        });
+        imageView.setImageResource(optionItem.getImageResource());
+        textView.setText(optionItem.getOptionName());
+
+        view.setOnClickListener(v -> handleOptionClick(optionItem));
+
+        return view;
     }
 
     private void handleOptionClick(OptionItem optionItem) {
@@ -83,19 +76,4 @@ public class OptionsAdapter extends RecyclerView.Adapter<OptionsAdapter.ViewHold
         context.startActivity(intent);
     }
 
-    @Override
-    public int getItemCount() {
-        return optionItemList.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
-        TextView textView;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.imageOption);
-            textView = itemView.findViewById(R.id.textOption);
-        }
-    }
 }

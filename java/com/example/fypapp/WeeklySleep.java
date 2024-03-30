@@ -36,16 +36,17 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weekly_sleep);
 
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation1);
         barChart = findViewById(R.id.barChartWeekly);
         dateTextView = findViewById(R.id.dateTextViewWeekly);
+        bottomNavigationView.setItemIconTintList(null);
 
         fetchWeeklySleepData();
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if (item.getItemId() == R.id.action_back) {
+                if (item.getItemId() == R.id.action_back1) {
                     onBackPressed();
                     return true;
                 } else if (item.getItemId() == R.id.action_homePage) {
