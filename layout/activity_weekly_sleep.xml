@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         app:menu="@menu/bottom_navigation_menu_2"
-        app:itemIconTint="@thatnull"/>
+        app:itemIconTint="@null"/>
 
 <TextView
         android:id="@+id/dateTextViewWeekly"
