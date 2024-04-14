@@ -2,11 +2,13 @@ package com.example.fypapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +21,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -55,6 +59,7 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
         textViewUserEmail.setText("Welcome " + temp[0]);
         ButtonAnalysis = findViewById(R.id.ButtonAnalysis);
         ButtonAnalysis.setOnClickListener(this);
+
     }
 
     public void analyseText() {
@@ -111,6 +116,34 @@ public class Journal extends AppCompatActivity implements View.OnClickListener {
         }
 
     }
+    public void getSpeechInput(View view) {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, 10);
+        } else {
+            Toast.makeText(this, "Your Device does not support speech input", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case 10:
+                if (resultCode == RESULT_OK && data != null) {
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    String speechInput = result.get(0);
+                    EditText journal = findViewById(R.id.journal);
+                    journal.setText(speechInput);
+                    analyseText();
+                }
+                break;
+        }
+    }
+
 
     private void saveMoodToDatabase(float positivePercentage, float negativePercentage) {
         FirebaseUser user = firebaseAuth.getCurrentUser();

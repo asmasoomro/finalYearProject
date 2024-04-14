@@ -1,6 +1,9 @@
 package com.example.fypapp;
+import android.Manifest;
+
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
@@ -13,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,11 +40,15 @@ public class HomePage extends AppCompatActivity implements View.OnClickListener{
     private TextView txtnegative;
     private TextView txtpositive;
     String sourceText;
+    private DatabaseReference moodDatabaseRef;
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+        moodDatabaseRef = FirebaseDatabase.getInstance().getReference("user_moods");
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
@@ -54,6 +63,9 @@ public class HomePage extends AppCompatActivity implements View.OnClickListener{
         textViewUserEmail.setText("Welcome " + temp[0]);
         ButtonAnalysis = findViewById(R.id.ButtonAnalysis);
         ButtonAnalysis.setOnClickListener(this);
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_AUDIO_PERMISSION);
+        }
     }
 
 
@@ -133,6 +145,52 @@ public class HomePage extends AppCompatActivity implements View.OnClickListener{
             txtpositive.setText(ex.getMessage());
             txtnegative.setText(ex.getMessage());
         }
+    }
+
+    private void saveMoodToDatabase(float positivePercentage, float negativePercentage) {
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+            DatabaseReference userMoodRef = moodDatabaseRef.child(userId).child("moods");
+
+            String timestamp = String.valueOf(System.currentTimeMillis());
+
+            Mood mood = new Mood(positivePercentage, negativePercentage);
+
+            // userMoodRef.child(timestamp).setValue(mood);
+            DatabaseReference moodEntryRef = userMoodRef.child(timestamp);
+            moodEntryRef.setValue(mood);
+
+            DatabaseReference positivePercentageRef = moodEntryRef.child("positivePercentage");
+            positivePercentageRef.setValue(positivePercentage);
+        }
+    }
+    private void suggestActivities(float positivePercentage, float negativePercentage) {
+        if (positivePercentage > 70) {
+            suggestPositiveActivities();
+        } else if (negativePercentage > 70) {
+            suggestActivitiesToImproveMood();
+        } else {
+            suggestDefaultActivities();
+        }
+    }
+
+    private void suggestPositiveActivities() {
+        Intent intent = new Intent(HomePage.this, PositiveActivities.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void suggestActivitiesToImproveMood() {
+        Intent intent = new Intent(HomePage.this, Activities.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void suggestDefaultActivities() {
+        Intent intent = new Intent(HomePage.this, DefaultActivities.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

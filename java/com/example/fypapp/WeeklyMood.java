@@ -113,7 +113,9 @@ public class WeeklyMood extends AppCompatActivity {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent notificationIntent = new Intent(this, WeeklyNotificationReceiver.class);
         notificationIntent.setAction("WEEKLY_MOOD_NOTIFICATION"); // Add action for distinguishing between mood and sleep notifications
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Add FLAG_IMMUTABLE or FLAG_MUTABLE here
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE); // Add the flag here
 
         // Calculate the time for end of the week (e.g., Sunday 6 PM)
         Calendar calendar = Calendar.getInstance();
@@ -127,8 +129,6 @@ public class WeeklyMood extends AppCompatActivity {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
         }
     }
-
-
 
     private void fetchWeeklyMoodsFromDatabase(String userId) {
         DatabaseReference userMoodsRef = FirebaseDatabase.getInstance().getReference("user_moods").child(userId).child("moods");
