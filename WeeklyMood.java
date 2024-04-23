@@ -1,5 +1,14 @@
 package com.example.fypapp;
+import android.Manifest;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -8,6 +17,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -23,6 +36,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.firebase.Firebase;
+
 import android.graphics.Color;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,24 +52,94 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class WeeklyMood extends AppCompatActivity {
-private TextView textView;
+    private TextView textView;
+    private static final int PERMISSION_REQUEST_CODE = 1001;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weekly_mood);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        createNotificationChannel();
+        scheduleWeeklyNotifications();
         //if user is logged in
         if (currentUser != null) {
             // Get the user ID
             String userId = currentUser.getUid();
             fetchWeeklyMoodsFromDatabase(userId);
         } else {
-           //if user not logged in
+            //if user not logged in
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Weekly Notifications";
+            String description = "Receive weekly mood chart and sleep tracker notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("weekly_notifications", name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void showNotification(String title, String message) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "weekly_notifications")
+                    .setSmallIcon(R.drawable.notify)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            notificationManager.notify(1, builder.build());
+        } else {
+            // Handle the case where permission is not granted
+            requestPermission();
+        }
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, PERMISSION_REQUEST_CODE);
+    }
+
+    private void scheduleWeeklyNotifications() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent notificationIntent = new Intent(this, WeeklyNotificationReceiver.class);
+        notificationIntent.setAction("WEEKLY_MOOD_NOTIFICATION"); // Add action for distinguishing between mood and sleep notifications
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        if (alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed to show the notification
+                showNotification("Title", "Your notification message");
+            } else {
+                // Permission denied, show a message or handle the case accordingly
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -148,12 +232,13 @@ private TextView textView;
         lineChart.setData(lineData);
         lineChart.invalidate();
 
+
         String message = "Weekly Mood Chart displayed";
         textView = findViewById(R.id.textViewMessage);
         textView.setText(message);
         textView.setVisibility(View.VISIBLE);
 
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        showNotification("Weekly Mood Chart", message); // Show notification
     }
 
     public class PercentAxisValueFormatter extends ValueFormatter {
