@@ -1,4 +1,5 @@
 package com.example.fypapp;
+import android.Manifest;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -56,6 +58,7 @@ import java.util.Locale;
 
 public class WeeklyMood extends AppCompatActivity {
     private TextView textView;
+    private static final int PERMISSION_REQUEST_CODE = 1001;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,24 +92,23 @@ public class WeeklyMood extends AppCompatActivity {
     }
 
     private void showNotification(String title, String message) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "weekly_notifications")
-                .setSmallIcon(R.drawable.notify)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "weekly_notifications")
+                    .setSmallIcon(R.drawable.notify)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            notificationManager.notify(1, builder.build());
+        } else {
+            // Handle the case where permission is not granted
+            requestPermission();
         }
-        notificationManager.notify(1, builder.build()); // Notification ID can be any unique integer
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, PERMISSION_REQUEST_CODE);
     }
 
     private void scheduleWeeklyNotifications() {
@@ -114,19 +116,30 @@ public class WeeklyMood extends AppCompatActivity {
         Intent notificationIntent = new Intent(this, WeeklyNotificationReceiver.class);
         notificationIntent.setAction("WEEKLY_MOOD_NOTIFICATION"); // Add action for distinguishing between mood and sleep notifications
 
-        // Add FLAG_IMMUTABLE or FLAG_MUTABLE here
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE); // Add the flag here
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Calculate the time for end of the week (e.g., Sunday 6 PM)
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 18); // 6 PM
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
-        // Schedule the notification
         if (alarmManager != null) {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed to show the notification
+                showNotification("Title", "Your notification message");
+            } else {
+                // Permission denied, show a message or handle the case accordingly
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

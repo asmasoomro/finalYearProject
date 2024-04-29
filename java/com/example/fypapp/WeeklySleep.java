@@ -1,5 +1,6 @@
 package com.example.fypapp;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,6 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -43,6 +45,7 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
     private BarChart barChart;
     private TextView dateTextView;
     private BottomNavigationView bottomNavigationView;
+    private static final int PERMISSION_REQUEST_CODE = 1001;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,46 +92,56 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
     }
 
     private void showNotification(String title, String message) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "weekly_notifications")
-                .setSmallIcon(R.drawable.notify)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WAKE_LOCK) == PackageManager.PERMISSION_GRANTED) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "weekly_notifications")
+                    .setSmallIcon(R.drawable.notify)
+                    .setContentTitle(title)
+                    .setContentText(message)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+            notificationManager.notify(1, builder.build());
+        } else {
+            // Handle the case where permission is not granted
+            requestPermission();
         }
-        notificationManager.notify(1, builder.build()); // Notification ID can be any unique integer
+    }
+
+    private void requestPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WAKE_LOCK}, PERMISSION_REQUEST_CODE);
     }
 
     private void scheduleWeeklyNotifications() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent notificationIntent = new Intent(this, WeeklyNotificationReceiver.class);
-        notificationIntent.setAction("WEEKLY_MOOD_NOTIFICATION"); // Add action for distinguishing between mood and sleep notifications
+        notificationIntent.setAction("WEEKLY_MOOD_NOTIFICATION");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        // Add FLAG_IMMUTABLE or FLAG_MUTABLE here
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE); // Add the flag here
-
-        // Calculate the time for end of the week (e.g., Sunday 6 PM)
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        calendar.set(Calendar.HOUR_OF_DAY, 18); // 6 PM
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
 
-        // Schedule the notification
         if (alarmManager != null) {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY * 7, pendingIntent);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed to show the notification
+                showNotification("Title", "Your notification message");
+            } else {
+                // Permission denied, show a message or handle the case accordingly
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void fetchWeeklySleepData() {
         String fitbitAccessToken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyM1JWQkMiLCJzdWIiOiJCUlM1UkQiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJhY3QgcnNldCBybG9jIHJ3ZWkgcmhyIHJwcm8gcm51dCByc2xlIiwiZXhwIjoxNzM3OTE1MTExLCJpYXQiOjE3MDYzNzkxMTF9.5vCuiUuQt7QiyNmzoVIeEjLpuBrDkrg6AaTdwizqK9M";
@@ -204,22 +217,26 @@ public class WeeklySleep extends AppCompatActivity implements FitbitApiTask.Fitb
     private class XAxisValueFormatter extends com.github.mikephil.charting.formatter.ValueFormatter {
         @Override
         public String getAxisLabel(float value, com.github.mikephil.charting.components.AxisBase axis) {
-            int index = (int) value;
+            Calendar calendar = Calendar.getInstance();
+            int today = calendar.get(Calendar.DAY_OF_WEEK);
+            //Fixing the bug to get the currents days
+            int index = ((int) value + (today - Calendar.SATURDAY) - 2) % 7;
+            if (index < 0) index += 7;
             switch (index) {
                 case 0:
-                    return "Mon";
-                case 1:
-                    return "Tue";
-                case 2:
-                    return "Wed";
-                case 3:
-                    return "Thu";
-                case 4:
-                    return "Fri";
-                case 5:
                     return "Sat";
-                case 6:
+                case 1:
                     return "Sun";
+                case 2:
+                    return "Mon";
+                case 3:
+                    return "Tue";
+                case 4:
+                    return "Wed";
+                case 5:
+                    return "Thu";
+                case 6:
+                    return "Fri";
                 default:
                     return "";
             }

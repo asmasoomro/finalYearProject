@@ -46,7 +46,7 @@ public class Favorite extends AppCompatActivity {
     }
 
     private void retrieveFavoritedActivities() {
-        // Assuming you have a FirebaseUser object representing the logged-in user
+        // Logged in user
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {

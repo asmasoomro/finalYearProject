@@ -26,9 +26,9 @@ public class WeeklyNotificationReceiver extends BroadcastReceiver {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            notificationManager.notify(1, builder.build()); // Notification ID can be any unique integer
+            notificationManager.notify(1, builder.build());
         } catch (SecurityException e) {
-            e.printStackTrace(); // Handle the exception as needed
+            e.printStackTrace();
         }
     }
 }

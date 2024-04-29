@@ -17,6 +17,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 // ActivitiesWorkedForMeActivity.java
 public class ActivitiesWorked extends AppCompatActivity {
@@ -46,14 +48,24 @@ public class ActivitiesWorked extends AppCompatActivity {
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String activityName = snapshot.child("feedback").getValue(String.class);
-                            float sentimentScore = snapshot.child("sentimentScore").getValue(Float.class);
+                    Map<String, Integer> activityOccurrences = new HashMap<>();
 
-                            if (activityName != null && sentimentScore > 50) {
-                                activityList.add(activityName);
-                            }
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String activityName = snapshot.child("feedback").getValue(String.class);
+                        float sentimentScore = snapshot.child("sentimentScore").getValue(Float.class);
+
+                        if (activityName != null && sentimentScore > 50) {
+                            activityOccurrences.put(activityName, activityOccurrences.getOrDefault(activityName, 0) + 1);
+                        }
                     }
+                    // Display activities with their occurrence count
+                    for (Map.Entry<String, Integer> entry : activityOccurrences.entrySet()) {
+                        String activityName = entry.getKey();
+                        int occurrenceCount = entry.getValue();
+                        String displayString = occurrenceCount > 1 ? activityName + " (worked " + occurrenceCount + " times)" : activityName;
+                        activityList.add(displayString);
+                    }
+
                     adapter.notifyDataSetChanged();
                 }
 
@@ -63,7 +75,7 @@ public class ActivitiesWorked extends AppCompatActivity {
                 }
             });
         } else {
-
+            // Handle case when user is not logged in
         }
     }
 }
